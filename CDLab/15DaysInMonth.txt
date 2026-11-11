@@ -1,0 +1,31 @@
+%{
+    #include<stdio.h>
+    Int year;
+%}
+
+%%
+jan|mar|may|july|aug|oct|dec {printf("31 days");}
+
+april|june|sep|nov {printf("30 days");}
+
+feb {leap();}
+
+[a-zA-Z]* {printf("invalid");}
+
+%%
+
+main()
+{
+    yylex();
+}
+
+leap()
+{
+    printf("enter year");
+    scanf("%d",&year);
+
+    if(year%4==0)
+        printf("29 days");
+    else
+        printf("28 days");
+}

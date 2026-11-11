@@ -1,0 +1,17 @@
+
+#include <stdio.h>
+
+int main() {
+    static int a = 10;
+    static int b = 20;
+    static int c;
+
+    c = a + b;
+
+    printf("Static Storage Allocation\n");
+    printf("Value of a = %d\n", a);
+    printf("Value of b = %d\n", b);
+    printf("Value of c = %d\n", c);
+
+    return 0;
+}

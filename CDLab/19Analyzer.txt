@@ -1,0 +1,20 @@
+%{
+    #include<stdio.h>
+%}
+
+%%
+If|else|while|do|switch|case|break|for|default
+    {printf("Keyword");}
+
+IF|ELSE|WHILE|DO|SWITCH|CASE|BREAK|FOR|DEFAULT
+    {printf("Keyword");}
+
+[A-Za-z_]+[a-zA-Z0-9_]*
+    {printf("identifier");}
+
+%%
+
+main()
+{
+    yylex();
+}

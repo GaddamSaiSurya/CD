@@ -1,0 +1,51 @@
+
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+int main() {
+    char str[50];
+
+    const char *keywords[] = {
+        "if", "else", "while", "do", "switch",
+        "case", "default", "continue", "return",
+        "goto", "for", "break"
+    };
+
+    int n = sizeof(keywords) / sizeof(keywords[0]);
+    int found = 0;
+
+    printf("Enter a word: ");
+    scanf("%49s", str);
+
+    for (int i = 0; i < n; i++) {
+        if (strcmp(str, keywords[i]) == 0) {
+            found = 1;
+            break;
+        }
+    }
+
+    if (found) {
+        printf("%s is a flow control keyword\n", str);
+    }
+    else if (isalpha(str[0]) || str[0] == '_') {
+        found = 1;
+
+        for (int i = 1; str[i] != '\0'; i++) {
+            if (!isalnum(str[i]) && str[i] != '_') {
+                found = 0;
+                break;
+            }
+        }
+
+        if (found)
+            printf("%s is a valid identifier\n", str);
+        else
+            printf("%s is not a valid identifier\n", str);
+    }
+    else {
+        printf("%s is not a valid identifier\n", str);
+    }
+
+    return 0;
+}

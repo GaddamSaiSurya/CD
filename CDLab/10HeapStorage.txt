@@ -1,0 +1,128 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define HEAP_SIZE 512
+
+typedef struct Block {
+    int size;
+    int is_free;
+    struct Block *next;
+} Block;
+
+union Heap {
+    long double alignment;
+    char memory[HEAP_SIZE];
+};
+
+static union Heap pool;
+static Block *freeList;
+
+void init_heap() {
+    freeList = (Block *)pool.memory;
+
+    freeList->size = HEAP_SIZE - sizeof(Block);
+    freeList->is_free = 1;
+    freeList->next = NULL;
+}
+
+void *heap_alloc(int size) {
+    Block *curr = freeList;
+
+    while (curr != NULL) {
+        if (curr->is_free && curr->size >= size) {
+
+            if (curr->size >= size + sizeof(Block) + 4) {
+                Block *newBlock = (Block *)
+                    ((char *)curr + sizeof(Block) + size);
+
+                newBlock->size =
+                    curr->size - size - sizeof(Block);
+
+                newBlock->is_free = 1;
+                newBlock->next = curr->next;
+
+                curr->size = size;
+                curr->next = newBlock;
+            }
+
+            curr->is_free = 0;
+
+            printf("Allocated %d bytes\n", size);
+
+            return (char *)curr + sizeof(Block);
+        }
+
+        curr = curr->next;
+    }
+
+    printf("Heap Out of Memory!\n");
+    return NULL;
+}
+
+void heap_free(void *ptr) {
+    if (ptr == NULL)
+        return;
+
+    Block *block = (Block *)
+        ((char *)ptr - sizeof(Block));
+
+    block->is_free = 1;
+
+    printf("Memory block freed\n");
+
+    Block *curr = freeList;
+
+    while (curr && curr->next) {
+        if (curr->is_free && curr->next->is_free) {
+            curr->size += sizeof(Block) + curr->next->size;
+            curr->next = curr->next->next;
+        } else {
+            curr = curr->next;
+        }
+    }
+}
+
+void display_heap_status() {
+    Block *curr = freeList;
+    int index = 0;
+
+    printf("\n--- Current Heap Status ---\n");
+
+    while (curr != NULL) {
+        printf("Block %d: Size = %d bytes | Status = %s\n",
+               index++,
+               curr->size,
+               curr->is_free ? "FREE" : "ALLOCATED");
+
+        curr = curr->next;
+    }
+
+    printf("---------------------------\n");
+}
+
+int main() {
+    init_heap();
+
+    void *p1 = heap_alloc(64);
+    void *p2 = heap_alloc(128);
+    void *p3 = heap_alloc(32);
+
+    display_heap_status();
+
+    heap_free(p2);
+
+    display_heap_status();
+
+    void *p4 = heap_alloc(64);
+
+    display_heap_status();
+
+    heap_free(p1);
+    heap_free(p3);
+    heap_free(p4);
+
+    display_heap_status();
+
+    return 0;
+}
